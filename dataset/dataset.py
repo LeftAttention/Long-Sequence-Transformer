@@ -23,3 +23,17 @@ class Days_dataset(Dataset):
         
         self._read_data()
         
+    def _read_data(self):
+        le = LabelEncoder()
+        scaler = RobustScaler()
+        
+        df_raw = pd.read_csv(self.root)
+        df_data = df_raw[df_raw.columns[1:]]
+        
+        categorical_cols = list(df_data.select_dtypes(include = 'object').columns)
+        
+        df_data[categorical_cols] = df_data[categorical_cols].apply(lambda col: le.fit_transform(col))
+        data = scaler.fit_transform(df_data.values)
+        
+        
+        
