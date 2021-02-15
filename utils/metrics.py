@@ -8,3 +8,6 @@ def CORR(pred, true):
     d = np.sqrt(((true-true.mean(0))**2*(pred-pred.mean(0))**2).sum(0))
     return (u/d).mean(-1)
 
+def MAE(pred, true):
+    return np.mean(np.abs(pred-true))
+
