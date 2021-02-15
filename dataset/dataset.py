@@ -52,3 +52,16 @@ class HourDataset(Dataset):
         self.data_x = data
         self.data_y = data
         self.data_stamp = data_stamp
+        
+    def __getitem__(self, index):
+        s_begin = index
+        s_end = s_begin + self.seq_len
+        r_begin = s_end - self.label_len 
+        r_end = r_begin + self.label_len + self.pred_len
+
+        seq_x = torch.from_numpy(self.data_x[s_begin:s_end])
+        seq_y = torch.from_numpy(self.data_y[r_begin:r_end])
+        seq_x_mark = torch.from_numpy(self.data_stamp[s_begin:s_end])
+        seq_y_mark = torch.from_numpy(self.data_stamp[r_begin:r_end])
+
+        return seq_x, seq_y, seq_x_mark, seq_y_mark
