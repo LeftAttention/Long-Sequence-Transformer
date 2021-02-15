@@ -9,9 +9,9 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 import warnings
 warnings.filterwarnings('ignore')
 
-class Days_dataset(Dataset):
+class HourDataset(Dataset):
     
-    def __init__(self, root, mode='train', scale=True, x_window=96, y_window=72, inter=48):
+    def __init__(self, root, mode='train', scale=True, x_window=96, y_window=72, inter=48, date_col='date'):
         
         assert mode in ['train', 'test', 'val']
         
@@ -20,6 +20,7 @@ class Days_dataset(Dataset):
         self.x_window = x_window
         self.y_window = y_window
         self.inter = inter
+        self.date_col = date_col
         
         self._read_data()
         
@@ -36,4 +37,9 @@ class Days_dataset(Dataset):
         data = scaler.fit_transform(df_data.values)
         
         
-        
+        df_stamp = df_raw[[self.date_col]]
+        df_stamp['date'] = pd.to_datetime(df_stamp.self.date_col)
+        df_stamp['month'] = df_stamp.date.apply(lambda row:row.month,1)
+        df_stamp['day'] = df_stamp.date.apply(lambda row:row.day,1)
+        df_stamp['weekday'] = df_stamp.date.apply(lambda row:row.weekday(),1)
+        df_stamp['hour'] = df_stamp.date.apply(lambda row:row.hour,1)
