@@ -43,3 +43,12 @@ class HourDataset(Dataset):
         df_stamp['day'] = df_stamp.date.apply(lambda row:row.day,1)
         df_stamp['weekday'] = df_stamp.date.apply(lambda row:row.weekday(),1)
         df_stamp['hour'] = df_stamp.date.apply(lambda row:row.hour,1)
+
+        if self.date_col != 'date':
+            data_stamp = df_stamp.drop(['date', self.date_col],1).values
+        else:
+            data_stamp = df_stamp.drop(['date'],1).values
+            
+        self.data_x = data
+        self.data_y = data
+        self.data_stamp = data_stamp
