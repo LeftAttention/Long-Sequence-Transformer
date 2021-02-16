@@ -15,3 +15,6 @@ class LongTimeFormer(nn.Module):
                 dropout=0.0, attn='prob', embed='fixed', activation='gelu', 
                 device=torch.device('cuda:0')):
         super(LongTimeFormer, self).__init__()
+
+        self.pred_len = out_len
+        self.attn = attn
