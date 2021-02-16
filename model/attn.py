@@ -38,3 +38,26 @@ class ProbAttention(nn.Module):
         self.scale = scale
         self.mask_flag = mask_flag
         self.dropout = nn.Dropout(attention_dropout)
+
+    def _prob_QK(self, Q, K, sample_k, n_top):
+        # Q [B, H, L, D]
+        B, H, L, E = K.shape
+        _, _, S, _ = Q.shape
+
+        # calculate the sampled Q_K
+        K_expand = K.unsqueeze(-3).expand(B, H, S, L, E)
+        indx_sample = torch.randint(L, (S, sample_k))
+        K_sample = K_expand[:, :, torch.arange(S).unsqueeze(1), indx_sample, :]
+        Q_K_sample = torch.matmul(Q.unsqueeze(-2), K_sample.transpose(-2, -1)).squeeze()
+
+        # find the Top_k query with sparisty measurement
+        M = Q_K_sample.max(-1)[0] - torch.div(Q_K_sample.sum(-1), L)
+        M_top = M.topk(n_top, sorted=False)[1]
+
+        # use the reduced Q to calculate Q_K
+        Q_reduce = Q[torch.arange(B)[:, None, None],
+                     torch.arange(H)[None, :, None],
+                     M_top, :]
+        Q_K = torch.matmul(Q_reduce, K.transpose(-2, -1))
+
+        return Q_K, M_top
