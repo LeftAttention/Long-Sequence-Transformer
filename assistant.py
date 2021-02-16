@@ -41,4 +41,35 @@ class Assistant(object):
         self.criterion =  nn.MSELoss()
         self.model_optim = optim.Adam(self.model.parameters(), lr=config.learning_rate)
         
-  
+    def to_cuda(self):
+        self.model.to(self.device)
+        
+    def change_mode(self, mode='train'):
+        self.model.train() if mode == 'train' else self.model.eval()
+        
+    def validate(self):
+        
+        total_loss = []
+        
+        with torch.no_grad():
+            for i, (batch_x,batch_y,batch_x_mark,batch_y_mark) in enumerate(self.val_loader):
+                batch_x = batch_x.double().to(self.device)
+                batch_y = batch_y.double()
+
+                batch_x_mark = batch_x_mark.double().to(self.device)
+                batch_y_mark = batch_y_mark.double().to(self.device)
+
+                # decoder input
+                dec_inp = torch.zeros_like(batch_y[:,-self.config.pred_len:,:]).double()
+                dec_inp = torch.cat([batch_y[:,:self.config.label_len,:], dec_inp], dim=1).double().to(self.device)
+
+                # encoder - decoder
+                outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                batch_y = batch_y[:,-self.config.pred_len:,:].to(self.device)
+
+                loss = self.criterion(outputs, batch_y) 
+
+                total_loss.append(loss.item())
+        
+        total_loss = np.average(total_loss)
+        return total_loss
