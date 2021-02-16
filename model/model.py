@@ -23,4 +23,5 @@ class LongTimeFormer(nn.Module):
         self.enc_embedding = DataEmbedding(enc_in, d_model, embed, data, dropout)
         self.dec_embedding = DataEmbedding(dec_in, d_model, embed, data, dropout)
         
-        
+        # Attention
+        Attn = ProbAttention if attn=='prob' else FullAttention    
