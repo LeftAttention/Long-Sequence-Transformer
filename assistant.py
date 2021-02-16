@@ -41,6 +41,22 @@ class Assistant(object):
         self.criterion =  nn.MSELoss()
         self.model_optim = optim.Adam(self.model.parameters(), lr=config.learning_rate)
         
+        train_set = HourDataset(self.config.root)
+        val_set = HourDataset(self.config.val_root)
+        
+        self.train_loader = DataLoader(train_set,
+                                       batch_size=64,
+                                       shuffle=True,
+                                       drop_last=True,
+                                       pin_memory=True,
+                                      )
+        self.val_loader = DataLoader(val_set,
+                                     batch_size=64,
+                                     shuffle=False,
+                                     drop_last=True,
+                                     pin_memory=True,
+                                    )
+        
     def to_cuda(self):
         self.model.to(self.device)
         
