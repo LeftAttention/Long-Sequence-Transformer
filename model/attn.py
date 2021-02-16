@@ -30,3 +30,11 @@ class FullAttention(nn.Module):
         V = torch.einsum("bhls,bshd->blhd", A, values)
 
         return V.contiguous()
+    
+class ProbAttention(nn.Module):
+    def __init__(self, mask_flag=True, factor=5, scale=None, attention_dropout=0.1):
+        super(ProbAttention, self).__init__()
+        self.factor = factor
+        self.scale = scale
+        self.mask_flag = mask_flag
+        self.dropout = nn.Dropout(attention_dropout)
