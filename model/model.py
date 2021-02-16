@@ -45,3 +45,21 @@ class LongTimeFormer(nn.Module):
             ],
             norm_layer=torch.nn.LayerNorm(d_model)
         )
+
+        # Decoder
+        self.decoder = Decoder(
+            [
+                DecoderLayer(
+                    AttentionLayer(FullAttention(True, factor, attention_dropout=dropout), 
+                                d_model, n_heads),
+                    AttentionLayer(FullAttention(False, factor, attention_dropout=dropout), 
+                                d_model, n_heads),
+                    d_model,
+                    d_ff,
+                    dropout=dropout,
+                    activation=activation,
+                )
+                for l in range(d_layers)
+            ],
+            norm_layer=torch.nn.LayerNorm(d_model)
+        )
