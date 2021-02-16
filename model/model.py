@@ -25,3 +25,23 @@ class LongTimeFormer(nn.Module):
         
         # Attention
         Attn = ProbAttention if attn=='prob' else FullAttention    
+
+        # Encoder
+        self.encoder = Encoder(
+            [
+                EncoderLayer(
+                    AttentionLayer(Attn(False, factor, attention_dropout=dropout), 
+                                d_model, n_heads),
+                    d_model,
+                    d_ff,
+                    dropout=dropout,
+                    activation=activation
+                ) for l in range(e_layers)
+            ],
+            [
+                ConvLayer(
+                    d_model
+                ) for l in range(e_layers-1)
+            ],
+            norm_layer=torch.nn.LayerNorm(d_model)
+        )
