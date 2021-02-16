@@ -55,3 +55,29 @@ class FixedEmbedding(nn.Module):
 
     def forward(self, x):
         return self.emb(x).detach()
+
+class TemporalEmbedding(nn.Module):
+    def __init__(self, d_model, embed_type='fixed'):
+        super(TemporalEmbedding, self).__init__()
+
+        month_size = 13
+        day_size = 32
+        weekday_size = 7
+        hour_size = 24
+
+        Embed = FixedEmbedding if embed_type=='fixed' else nn.Embedding
+
+        self.month_embed = Embed(month_size, d_model)
+        self.day_embed = Embed(day_size, d_model)
+        self.weekday_embed = Embed(weekday_size, d_model)
+        self.hour_embed = Embed(hour_size, d_model) 
+    
+    def forward(self, x):
+        x = x.long()
+        
+        month_x = self.month_embed(x[:,:,0])
+        day_x = self.day_embed(x[:,:,1])
+        weekday_x = self.weekday_embed(x[:,:,2])
+        hour_x = self.hour_embed(x[:,:,3])
+        
+        return hour_x + weekday_x + day_x + month_x
