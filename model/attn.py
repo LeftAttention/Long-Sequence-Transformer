@@ -61,3 +61,13 @@ class ProbAttention(nn.Module):
         Q_K = torch.matmul(Q_reduce, K.transpose(-2, -1))
 
         return Q_K, M_top
+
+    def _get_initial_context(self, V, L_Q):
+        B, H, L_V, D = V.shape
+        if not self.mask_flag:
+            V_sum = V.sum(dim=-2)
+            contex = V_sum.unsqueeze(-2).expand(B, H, L_Q, V_sum.shape[-1]).clone()
+        else: # use mask
+            assert(L_Q == L_V) # requires that L_Q == L_V, i.e. for self-attention only
+            contex = V.cumsum(dim=-1)
+        return contex
