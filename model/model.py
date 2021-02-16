@@ -63,3 +63,5 @@ class LongTimeFormer(nn.Module):
             ],
             norm_layer=torch.nn.LayerNorm(d_model)
         )
+
+        self.projection = nn.Linear(d_model, c_out, bias=True)
