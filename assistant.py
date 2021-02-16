@@ -50,7 +50,7 @@ class Assistant(object):
     def validate(self):
         
         total_loss = []
-        
+        self.change_mode('val')
         with torch.no_grad():
             for i, (batch_x,batch_y,batch_x_mark,batch_y_mark) in enumerate(self.val_loader):
                 batch_x = batch_x.double().to(self.device)
@@ -72,6 +72,7 @@ class Assistant(object):
                 total_loss.append(loss.item())
         
         total_loss = np.average(total_loss)
+        self.change_mode('train')
         return total_loss
 
     def train(self):
