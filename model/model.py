@@ -18,3 +18,9 @@ class LongTimeFormer(nn.Module):
 
         self.pred_len = out_len
         self.attn = attn
+
+        # Embedding
+        self.enc_embedding = DataEmbedding(enc_in, d_model, embed, data, dropout)
+        self.dec_embedding = DataEmbedding(dec_in, d_model, embed, data, dropout)
+        
+        
