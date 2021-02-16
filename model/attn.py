@@ -85,3 +85,26 @@ class ProbAttention(nn.Module):
                    torch.arange(H)[None, :, None],
                    index, :] = torch.matmul(attn, V)
         return context_in
+
+    def forward(self, queries, keys, values, attn_mask):
+        B, L, H, D = queries.shape
+        _, S, _, _ = keys.shape
+
+        queries = queries.view(B, H, L, -1)
+        keys = keys.view(B, H, S, -1)
+        values = values.view(B, H, S, -1)
+
+        U = self.factor * np.ceil(np.log(S)).astype('int').item()
+        u = self.factor * np.ceil(np.log(L)).astype('int').item()
+        
+        scores_top, index = self._prob_QK(queries, keys, u, U)
+        # add scale factor
+        scale = self.scale or 1./sqrt(D)
+        if scale is not None:
+            scores_top = scores_top * scale
+        # get the context
+        context = self._get_initial_context(values, L)
+        # update the context with selected top_k queries
+        context = self._update_context(context, values, scores_top, index, L, attn_mask)
+        
+        return context.contiguous()
